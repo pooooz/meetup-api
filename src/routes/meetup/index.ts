@@ -1,4 +1,5 @@
 import express from 'express';
+
 import { MeetupController } from '../../db/controllers/meetup';
 
 const router = express.Router();
