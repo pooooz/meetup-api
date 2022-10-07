@@ -18,8 +18,8 @@ function sql(file: string): QueryFile {
 }
 
 export const meetupQueries = {
-  getAll: sql('meetup/getAll.sql'),
-  getById: sql('meetup/getById.sql'),
+  getAll: sql('meetup/selectAll.sql'),
+  getById: sql('meetup/selectById.sql'),
   deleteById: sql('meetup/deleteById.sql'),
   create: sql('meetup/create.sql'),
 };

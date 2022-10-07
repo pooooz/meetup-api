@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { db } from '../../constants';
+import { db } from '../constants';
 import { CreateMeetupPayload } from './interfaces';
-import { meetupQueries } from '../sql';
+import { meetupQueries } from '../db/sql';
 
 class Meetup {
   async getAllMeetups(req: Request, res: Response, next: NextFunction) {
