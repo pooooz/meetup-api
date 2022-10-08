@@ -22,7 +22,6 @@ module.exports = {
     },
   },
   rules: {
-    'import/prefer-default-export': 0,
     'import/extensions': [
       'error',
       'ignorePackages',
@@ -33,5 +32,7 @@ module.exports = {
         tsx: 'never',
       },
     ],
+    'import/prefer-default-export': 0,
+    'class-methods-use-this': 0,
   },
 };
