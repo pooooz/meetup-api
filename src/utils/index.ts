@@ -14,10 +14,14 @@ export const generateInsertValues = (params: CreateMeetupPayload) => ({
 
 export const generateUpdateQuery = (id: string, params: UpdateMeetupPayload) => {
   const definedParams = Object.keys(params)
-    .filter((key) => params[key as keyof UpdateMeetupPayload])
+    .filter((key) => params[key as keyof UpdateMeetupPayload]
+      || params[key as keyof UpdateMeetupPayload] === null)
     .map((key) => ({ key, value: params[key as keyof UpdateMeetupPayload] }));
 
   const query = definedParams.map((elem, idx) => {
+    if (elem.value === null) {
+      return `${elem.key} = ${elem.value}${idx !== definedParams.length - 1 ? ',' : ''}`;
+    }
     if (elem.key === 'tags') {
       return `${elem.key} = ${generateFormattedTags(elem?.value as Array<string>)}${idx !== definedParams.length - 1 ? ',' : ''}`;
     }
