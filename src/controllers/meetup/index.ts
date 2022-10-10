@@ -3,15 +3,23 @@ import { NextFunction, Request, Response } from 'express';
 import { db } from '../../constants';
 import { CreateMeetupPayload, UpdateMeetupPayload } from './interfaces';
 import { meetupQueries } from '../../db/sql';
-import { generateInsertValues, generateUpdateQuery } from '../../utils';
-import { createMeetupSchema, idSchema, updateMeetupSchema } from './schemes';
+import { generateInsertValues, generateSearchQuery, generateUpdateQuery } from '../../utils';
+import {
+  createMeetupSchema, idSchema, updateMeetupSchema, queryObjectSchema,
+} from './schemes';
 
 class Meetup {
   async getAllMeetups(req: Request, res: Response, next: NextFunction) {
     try {
-      const allMeetups = await db.any(meetupQueries.getAll);
+      if (Object.keys(req.query).length === 0) {
+        const allMeetups = await db.any(meetupQueries.getAll);
+        res.status(200).json(allMeetups).end();
+      } else {
+        const params = await queryObjectSchema.validateAsync(req.query);
 
-      res.status(200).json(allMeetups);
+        const filteredMeetups = await db.any(generateSearchQuery(params));
+        res.status(200).json(filteredMeetups);
+      }
     } catch (error) {
       next(error);
     }
