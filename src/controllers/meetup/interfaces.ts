@@ -1,7 +1,7 @@
 export interface CreateMeetupPayload {
   name: string;
-  description?: string;
-  tags?: Array<string>;
+  description?: string | null;
+  tags?: Array<string> | null;
   timestamp: string;
 }
 
