@@ -5,7 +5,7 @@ import { CreateMeetupPayload, SearchMeetupPayload, UpdateMeetupPayload } from '.
 export const createMeetupSchema = Joi.object<CreateMeetupPayload>({
   name: Joi.string().required(),
   description: Joi.string().allow(null),
-  tags: Joi.array().items(Joi.string()).allow(null),
+  tags: Joi.array().items(Joi.string().required()).allow(null),
   timestamp: Joi.string().isoDate().required(),
 });
 
