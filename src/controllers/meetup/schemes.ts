@@ -25,4 +25,5 @@ export const queryObjectSchema = Joi.object<SearchMeetupPayload>({
   timestamp: Joi.string().isoDate(),
   from: Joi.string().isoDate(),
   to: Joi.string().isoDate(),
+  sort: Joi.string().pattern(/id|name|timestamp/, 'id, name, timestamp'),
 });
