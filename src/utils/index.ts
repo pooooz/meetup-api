@@ -35,7 +35,7 @@ export const generateUpdateQuery = (id: string, params: UpdateMeetupPayload) => 
 
 export const generateSearchQuery = (queries: SearchMeetupPayload) => {
   const {
-    name, description, tags, timestamp, from, to, sort,
+    name, description, tags, timestamp, from, to, sort, limit, page,
   } = queries;
   const paramsToMap = getDefinedParams({
     name, description, tags, timestamp,
@@ -70,5 +70,20 @@ export const generateSearchQuery = (queries: SearchMeetupPayload) => {
     sqlParams = `WHERE ${sqlParams}`;
   }
 
-  return `SELECT * FROM meetups ${sqlParams} ${sort ? `ORDER BY ${sort}` : ''};`;
+  if (sort) {
+    sqlParams += `ORDER BY ${sort} `;
+  }
+
+  if (page && limit) {
+    sqlParams += `OFFSET ${Number(limit) * (Number(page) - 1)} LIMIT ${limit}`;
+  }
+
+  return `SELECT * FROM meetups ${sqlParams};`;
+};
+
+export const generateElementsCountQuery = (queries: SearchMeetupPayload) => {
+  const {
+    page, limit, sort, ...restParams
+  } = queries;
+  return `SELECT COUNT(id) ${generateSearchQuery(restParams).slice(9)}`;
 };
