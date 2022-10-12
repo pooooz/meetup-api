@@ -23,3 +23,10 @@ export const meetupQueries = {
   deleteById: sql('meetup/deleteById.sql'),
   create: sql('meetup/create.sql'),
 };
+
+export const userQueries = {
+  create: sql('user/create.sql'),
+  getByEmail: sql('user/selectByEmail.sql'),
+  getById: sql('user/selectById.sql'),
+  updateRefreshToken: sql('user/updateRefreshToken.sql'),
+};
