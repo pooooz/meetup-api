@@ -35,7 +35,7 @@ export const generateUpdateQuery = (id: string, params: UpdateMeetupPayload) => 
 
 export const generateSearchQuery = (queries: SearchMeetupPayload) => {
   const {
-    name, description, tags, timestamp,
+    name, description, tags, timestamp, from, to, sort, limit, page,
   } = queries;
   const paramsToMap = getDefinedParams({
     name, description, tags, timestamp,
@@ -53,18 +53,37 @@ export const generateSearchQuery = (queries: SearchMeetupPayload) => {
     return `${elem.key} = '${elem.value}'`;
   }).join(' AND ');
 
-  if (sqlParams && (queries.from || queries.to)) {
+  if (sqlParams && (from || to)) {
     sqlParams += ' AND ';
   }
-  if (queries.from && !queries.to) {
-    sqlParams += `timestamp > '${queries.from}'`;
+  if (from && !to) {
+    sqlParams += `timestamp > '${from}'`;
   }
-  if (!queries.from && queries.to) {
-    sqlParams += `timestamp < '${queries.to}'`;
+  if (!from && to) {
+    sqlParams += `timestamp < '${to}'`;
   }
-  if (queries.from && queries.to) {
-    sqlParams += `timestamp BETWEEN '${queries.from}' AND '${queries.to}'`;
+  if (from && to) {
+    sqlParams += `timestamp BETWEEN '${from}' AND '${to}'`;
   }
 
-  return `SELECT * FROM meetups WHERE ${sqlParams};`;
+  if (sqlParams) {
+    sqlParams = `WHERE ${sqlParams}`;
+  }
+
+  if (sort) {
+    sqlParams += `ORDER BY ${sort} `;
+  }
+
+  if (page && limit) {
+    sqlParams += `OFFSET ${Number(limit) * (Number(page) - 1)} LIMIT ${limit}`;
+  }
+
+  return `SELECT * FROM meetups ${sqlParams};`;
+};
+
+export const generateElementsCountQuery = (queries: SearchMeetupPayload) => {
+  const {
+    page, limit, sort, ...restParams
+  } = queries;
+  return `SELECT COUNT(id) ${generateSearchQuery(restParams).slice(9)}`;
 };

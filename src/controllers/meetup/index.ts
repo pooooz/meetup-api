@@ -3,7 +3,9 @@ import { NextFunction, Request, Response } from 'express';
 import { db } from '../../constants';
 import { CreateMeetupPayload, UpdateMeetupPayload } from './interfaces';
 import { meetupQueries } from '../../db/sql';
-import { generateInsertValues, generateSearchQuery, generateUpdateQuery } from '../../utils';
+import {
+  generateInsertValues, generateSearchQuery, generateUpdateQuery, generateElementsCountQuery,
+} from '../../utils';
 import {
   createMeetupSchema, idSchema, updateMeetupSchema, queryObjectSchema,
 } from './schemes';
@@ -13,12 +15,25 @@ class Meetup {
     try {
       if (Object.keys(req.query).length === 0) {
         const allMeetups = await db.any(meetupQueries.getAll);
-        res.status(200).json(allMeetups).end();
+        res.status(200).json({ meetups: allMeetups });
       } else {
         const params = await queryObjectSchema.validateAsync(req.query);
 
         const filteredMeetups = await db.any(generateSearchQuery(params));
-        res.status(200).json(filteredMeetups);
+
+        if (params.limit && params.page) {
+          const { count } = await db.one(generateElementsCountQuery(params));
+
+          const pagesCount = Number(count) / Number(params.limit);
+
+          res.status(200).json({
+            currentPage: Number(params.page),
+            totalPagesCount: Math.ceil(pagesCount),
+            meetups: filteredMeetups,
+          });
+        } else {
+          res.status(200).json(filteredMeetups);
+        }
       }
     } catch (error) {
       next(error);

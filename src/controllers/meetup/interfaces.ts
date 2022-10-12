@@ -12,6 +12,9 @@ export interface SearchMeetupPayload {
   timestamp?: string,
   from?: string,
   to?: string,
+  sort?: 'id' | 'name' | 'timestamp',
+  limit?: string;
+  page?: string;
 }
 
 export type UpdateMeetupPayload = Partial<CreateMeetupPayload>

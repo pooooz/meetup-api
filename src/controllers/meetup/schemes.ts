@@ -2,6 +2,9 @@ import Joi from 'joi';
 
 import { CreateMeetupPayload, SearchMeetupPayload, UpdateMeetupPayload } from './interfaces';
 
+const nonNegativeIntegerPattern = /^\d+$/;
+const integerGreaterThanZero = /^[1-9]\d*$/;
+
 export const createMeetupSchema = Joi.object<CreateMeetupPayload>({
   name: Joi.string().required(),
   description: Joi.string().allow(null),
@@ -16,7 +19,7 @@ export const updateMeetupSchema = Joi.object<UpdateMeetupPayload>({
   timestamp: Joi.string().isoDate(),
 });
 
-export const idSchema = Joi.string().pattern(/^\d+$/, 'number');
+export const idSchema = Joi.string().pattern(nonNegativeIntegerPattern, 'non-negative integer');
 
 export const queryObjectSchema = Joi.object<SearchMeetupPayload>({
   name: Joi.string(),
@@ -25,4 +28,7 @@ export const queryObjectSchema = Joi.object<SearchMeetupPayload>({
   timestamp: Joi.string().isoDate(),
   from: Joi.string().isoDate(),
   to: Joi.string().isoDate(),
+  sort: Joi.string().pattern(/id|name|timestamp/, 'id, name, timestamp'),
+  limit: Joi.string().pattern(integerGreaterThanZero, 'integer greater than zero'),
+  page: Joi.string().pattern(integerGreaterThanZero, 'integer greater than zero'),
 });
