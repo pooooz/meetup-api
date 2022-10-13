@@ -1,14 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { sign } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 
 import { db, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../constants';
-import { createUserSchema } from './schemes';
+import { createUserSchema, refreshTokenSchema } from './schemes';
 import { userQueries } from '../../db/sql';
 import {
   ACCESS_TOKEN_LIFETIME,
   REFRESH_TOKEN_LIFETIME,
 } from './constants';
+import { CustomJWTPayload } from './interfaces';
 
 class Auth {
   async signUp(req: Request, res: Response, next: NextFunction) {
@@ -68,7 +69,22 @@ class Auth {
 
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log('hello, refreshToken');
+      const { refreshToken } = await refreshTokenSchema.validateAsync(req.body);
+
+      const dataObject:
+        CustomJWTPayload | string = verify(
+          refreshToken,
+          REFRESH_TOKEN_SECRET as string,
+        );
+
+      const { id, name, email } = dataObject as CustomJWTPayload;
+      const accessToken = sign(
+        { id, name, email },
+        ACCESS_TOKEN_SECRET as string,
+        { expiresIn: ACCESS_TOKEN_LIFETIME },
+      );
+
+      res.status(200).send({ refreshToken, accessToken });
     } catch (error) {
       next(error);
     }

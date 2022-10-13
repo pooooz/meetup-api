@@ -20,7 +20,6 @@ const options = {
 };
 
 passport.use(new JWTStrategy(options, async (jwtPayload, done) => {
-  console.log(jwtPayload);
   try {
     const user = await db.oneOrNone(userQueries.getById, { id: jwtPayload.id });
     if (user) {
