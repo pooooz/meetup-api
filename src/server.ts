@@ -9,6 +9,7 @@ import {
   db, PORT, ACCESS_TOKEN_SECRET,
 } from './constants';
 import { userQueries } from './db/sql';
+import { errorMiddleware } from './middlewares/errorMiddleware';
 
 const app = express();
 
@@ -38,5 +39,7 @@ app.use(express.json());
 app.use('/meetup', passport.authenticate('jwt', { session: false }), MeetupRouter);
 
 app.use('/auth', AuthRouter);
+
+app.use(errorMiddleware);
 
 app.listen(port, () => console.log(`Server is running on port ${port}`));

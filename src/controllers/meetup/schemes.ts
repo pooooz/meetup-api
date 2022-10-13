@@ -1,6 +1,8 @@
 import Joi from 'joi';
 
-import { CreateMeetupPayload, SearchMeetupPayload, UpdateMeetupPayload } from './interfaces';
+import {
+  CreateMeetupPayload, SearchMeetupParams, SearchMeetupPayload, UpdateMeetupPayload,
+} from './interfaces';
 
 const nonNegativeIntegerPattern = /^\d+$/;
 const integerGreaterThanZero = /^[1-9]\d*$/;
@@ -19,7 +21,9 @@ export const updateMeetupSchema = Joi.object<UpdateMeetupPayload>({
   timestamp: Joi.string().isoDate(),
 });
 
-export const idSchema = Joi.string().pattern(nonNegativeIntegerPattern, 'non-negative integer');
+export const idSchema = Joi.object<SearchMeetupParams>({
+  id: Joi.string().pattern(nonNegativeIntegerPattern, 'non-negative integer'),
+});
 
 export const queryObjectSchema = Joi.object<SearchMeetupPayload>({
   name: Joi.string(),
