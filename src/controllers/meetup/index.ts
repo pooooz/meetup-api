@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { db } from '../../constants';
+import { db } from '../../database';
+import { meetupQueries } from '../../database/sql';
 import { CreateMeetupPayload, UpdateMeetupPayload } from './interfaces';
-import { meetupQueries } from '../../db/sql';
 import {
   generateInsertValues, generateSearchQuery, generateUpdateQuery, generateElementsCountQuery,
 } from '../../utils';
@@ -32,7 +32,9 @@ class Meetup {
             meetups: filteredMeetups,
           });
         } else {
-          res.status(200).json(filteredMeetups);
+          res.status(200).json({
+            meetups: filteredMeetups,
+          });
         }
       }
     } catch (error) {

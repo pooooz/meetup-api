@@ -6,6 +6,7 @@ const { QueryResultError } = pgPromise.errors;
 
 /* eslint no-unused-vars: 0 */
 export const errorMiddleware = (err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error(err);
   if (err instanceof ValidationError) {
     res.status(400).json(err.details[0]);
     return;
@@ -19,6 +20,7 @@ export const errorMiddleware = (err: any, req: Request, res: Response, next: Nex
   const undefinedError = {
     type: err.type || 'error',
     message: err.message || 'An unexpected error has occurred',
+    detail: err.detail || 'No details',
   };
 
   res.status(err.status || 500).json(undefinedError);

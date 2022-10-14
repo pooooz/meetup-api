@@ -15,3 +15,11 @@ export interface CustomJWTPayload extends JwtPayload{
   name?: string;
   email?: string;
 }
+
+export interface UserSchema {
+  id: number;
+  email: string;
+  name: string;
+  password: string;
+  refresh_token: string | null;
+}
