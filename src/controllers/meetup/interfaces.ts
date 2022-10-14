@@ -17,4 +17,8 @@ export interface SearchMeetupPayload {
   page?: string;
 }
 
+export interface SearchMeetupParams {
+  id: string;
+}
+
 export type UpdateMeetupPayload = Partial<CreateMeetupPayload>

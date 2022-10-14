@@ -42,8 +42,8 @@ class Meetup {
 
   async getMeetupById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
-      const meetup = await db.one(meetupQueries.getById, { id });
+      const { id } = await idSchema.validateAsync(req.params);
+      const meetup = await db.oneOrNone(meetupQueries.getById, { id });
 
       res.status(200).json(meetup);
     } catch (error) {
@@ -82,12 +82,10 @@ class Meetup {
     next: NextFunction,
   ) {
     try {
-      const { id } = req.params;
-
       const validValues = await updateMeetupSchema.validateAsync(req.body);
-      const validId = await idSchema.validateAsync(id);
+      const { id } = await idSchema.validateAsync(req.params);
 
-      const updatedMeetup = await db.one(generateUpdateQuery(validId, validValues));
+      const updatedMeetup = await db.one(generateUpdateQuery(id, validValues));
 
       res.status(200).json(updatedMeetup);
     } catch (error) {
