@@ -2,13 +2,12 @@ import { NextFunction, Request, Response } from 'express';
 
 import { db } from '../../database';
 import { meetupQueries } from '../../database/sql';
-import { CreateMeetupPayload, UpdateMeetupPayload } from './interfaces';
+import { CreateMeetupPayload, UpdateMeetupPayload } from '../../shemes/meetup/interfaces';
 import {
   generateInsertValues, generateSearchQuery, generateUpdateQuery, generateElementsCountQuery,
 } from '../../utils';
-import {
-  createMeetupSchema, idSchema, updateMeetupSchema, queryObjectSchema,
-} from './schemes';
+import { createMeetupSchema, updateMeetupSchema, idSchema } from '../../shemes/meetup';
+import { queryObjectSchema } from '../../shemes/queries';
 
 class Meetup {
   async getAllMeetups(req: Request, res: Response, next: NextFunction) {
@@ -59,7 +58,7 @@ class Meetup {
 
       const insertValues = generateInsertValues(validValues);
 
-      const meetup = await db.one(meetupQueries.create, insertValues);
+      const meetup = await db.one(meetupQueries.create, { ...insertValues, creator: req.user?.id });
 
       res.status(201).json(meetup);
     } catch (error) {
@@ -85,11 +84,16 @@ class Meetup {
   ) {
     try {
       const validValues = await updateMeetupSchema.validateAsync(req.body);
-      const { id } = await idSchema.validateAsync(req.params);
+      if (Object.keys(validValues).length !== 0) {
+        const { id } = await idSchema.validateAsync(req.params);
 
-      const updatedMeetup = await db.one(generateUpdateQuery(id, validValues));
+        const updatedMeetup = await db.one(generateUpdateQuery(id, validValues));
 
-      res.status(200).json(updatedMeetup);
+        res.status(200).json(updatedMeetup);
+        return;
+      }
+
+      res.status(400).json({ type: 'error', message: 'The request must contain fields to update' });
     } catch (error) {
       next(error);
     }

@@ -5,12 +5,13 @@ import { sign, verify } from 'jsonwebtoken';
 import { db } from '../../database';
 import { userQueries } from '../../database/sql';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../constants';
-import { createUserSchema, refreshTokenSchema } from './schemes';
+import { createUserSchema } from '../../shemes/user';
+import { refreshTokenSchema } from '../../shemes/tokens';
 import {
   ACCESS_TOKEN_LIFETIME,
   REFRESH_TOKEN_LIFETIME,
 } from './constants';
-import { CustomJWTPayload, UserSchema } from './interfaces';
+import { UserInfo } from '../../shemes/user/interfaces';
 import { convertLifetimeStringToMilliseconds } from '../../utils';
 
 class Auth {
@@ -19,7 +20,7 @@ class Auth {
       const { email, name, password } = await createUserSchema.validateAsync(req.body);
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const { id } = await db.one<UserSchema>(
+      const { id } = await db.one<UserInfo>(
         userQueries.create,
         { email, name, password: hashedPassword },
       );

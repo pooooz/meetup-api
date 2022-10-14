@@ -1,4 +1,5 @@
-import { CreateMeetupPayload, SearchMeetupPayload, UpdateMeetupPayload } from '../controllers/meetup/interfaces';
+import { CreateMeetupPayload, UpdateMeetupPayload } from '../shemes/meetup/interfaces';
+import { SearchMeetupPayload } from '../shemes/queries/interfaces';
 
 export const generateFormattedTags = (tags: Array<string>) => `'{${tags.map((tag) => `"${tag}"`).join(', ')}}'`;
 
