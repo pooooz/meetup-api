@@ -11,6 +11,7 @@ import {
   REFRESH_TOKEN_LIFETIME,
 } from './constants';
 import { CustomJWTPayload, UserSchema } from './interfaces';
+import { convertLifetimeStringToMilliseconds } from '../../utils';
 
 class Auth {
   async signUp(req: Request, res: Response, next: NextFunction) {
@@ -64,7 +65,13 @@ class Auth {
 
       await db.any(userQueries.updateRefreshToken, { id, refreshToken });
 
-      res.status(200)
+      res
+        .cookie('accessToken', accessToken, {
+          maxAge: convertLifetimeStringToMilliseconds(ACCESS_TOKEN_LIFETIME),
+        })
+        .cookie('refreshToken', refreshToken, {
+          maxAge: convertLifetimeStringToMilliseconds(REFRESH_TOKEN_LIFETIME),
+        }).status(200)
         .json({
           accessToken, refreshToken, id, name, email,
         });
@@ -75,7 +82,7 @@ class Auth {
 
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const { refreshToken } = await refreshTokenSchema.validateAsync(req.body);
+      const { refreshToken } = await refreshTokenSchema.validateAsync(req.cookies);
 
       const dataObject:
         CustomJWTPayload | string = verify(
@@ -90,7 +97,11 @@ class Auth {
         { expiresIn: ACCESS_TOKEN_LIFETIME },
       );
 
-      res.status(200).send({ refreshToken, accessToken });
+      res.cookie('accessToken', accessToken, {
+        maxAge: convertLifetimeStringToMilliseconds(ACCESS_TOKEN_LIFETIME),
+      })
+        .status(200)
+        .send({ refreshToken, accessToken });
     } catch (error) {
       next(error);
     }

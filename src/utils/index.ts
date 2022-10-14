@@ -87,3 +87,15 @@ export const generateElementsCountQuery = (queries: SearchMeetupPayload) => {
   } = queries;
   return `SELECT COUNT(id) ${generateSearchQuery(restParams).slice(9)}`;
 };
+
+export const convertLifetimeStringToMilliseconds = (lifetime: string) => {
+  if (/m$/.test(lifetime)) {
+    return Number(lifetime.slice(0, -1)) * 60 * 1000;
+  }
+
+  if (/d$/.test(lifetime)) {
+    return Number(lifetime.slice(0, -1)) * 24 * 3600 * 1000;
+  }
+
+  return 0;
+};

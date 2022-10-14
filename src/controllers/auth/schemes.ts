@@ -11,5 +11,6 @@ export const createUserSchema = Joi.object<CreateUserPayload>({
 });
 
 export const refreshTokenSchema = Joi.object<RefreshTokenPayload>({
+  accessToken: Joi.string(),
   refreshToken: Joi.string().required(),
 });

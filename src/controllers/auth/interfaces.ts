@@ -7,6 +7,7 @@ export interface CreateUserPayload {
 }
 
 export interface RefreshTokenPayload {
+  accessToken: string;
   refreshToken: string;
 }
 
