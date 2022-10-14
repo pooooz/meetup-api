@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { QueryFile, IQueryFileOptions } from 'pg-promise';
 import * as path from 'path';
 

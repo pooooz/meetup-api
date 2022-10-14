@@ -2,14 +2,15 @@ import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { sign, verify } from 'jsonwebtoken';
 
-import { db, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../constants';
+import { db } from '../../database';
+import { userQueries } from '../../database/sql';
+import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../constants';
 import { createUserSchema, refreshTokenSchema } from './schemes';
-import { userQueries } from '../../db/sql';
 import {
   ACCESS_TOKEN_LIFETIME,
   REFRESH_TOKEN_LIFETIME,
 } from './constants';
-import { CustomJWTPayload } from './interfaces';
+import { CustomJWTPayload, UserSchema } from './interfaces';
 
 class Auth {
   async signUp(req: Request, res: Response, next: NextFunction) {
@@ -17,9 +18,14 @@ class Auth {
       const { email, name, password } = await createUserSchema.validateAsync(req.body);
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const newUser = await db.one(userQueries.create, { email, name, password: hashedPassword });
+      const { id } = await db.one<UserSchema>(
+        userQueries.create,
+        { email, name, password: hashedPassword },
+      );
 
-      res.status(201).json(newUser);
+      res.status(201).json({
+        id, name, email,
+      });
     } catch (error) {
       next(error);
     }

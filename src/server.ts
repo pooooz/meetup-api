@@ -6,9 +6,10 @@ import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
 import MeetupRouter from './routes/meetup';
 import AuthRouter from './routes/auth';
 import {
-  db, PORT, ACCESS_TOKEN_SECRET,
+  PORT, ACCESS_TOKEN_SECRET,
 } from './constants';
-import { userQueries } from './db/sql';
+import { db } from './database';
+import { userQueries } from './database/sql';
 import { errorMiddleware } from './middlewares/errorMiddleware';
 
 const app = express();
