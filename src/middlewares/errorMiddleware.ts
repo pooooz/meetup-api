@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationError } from 'joi';
 import pgPromise from 'pg-promise';
+import { TokenExpiredError } from 'jsonwebtoken';
 
 const { QueryResultError } = pgPromise.errors;
 
@@ -14,6 +15,11 @@ export const errorMiddleware = (err: any, req: Request, res: Response, next: Nex
 
   if (err instanceof QueryResultError) {
     res.status(400).json({ message: err.message, status: 400, code: err.code });
+    return;
+  }
+
+  if (err instanceof TokenExpiredError) {
+    res.status(401).json(err);
     return;
   }
 
