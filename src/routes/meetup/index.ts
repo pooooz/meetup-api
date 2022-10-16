@@ -8,6 +8,7 @@ const router = express.Router();
 router.get('/', MeetupController.getAllMeetups);
 router.post('/', MeetupController.createMeetup);
 router.get('/:id', MeetupController.getMeetupById);
+router.put('/:id', MeetupController.enroll);
 router.patch('/:id', permissionCheck('creator'), MeetupController.changeMeetupInfo);
 router.delete('/:id', permissionCheck('creator'), MeetupController.deleteMeetupById);
 

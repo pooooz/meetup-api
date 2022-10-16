@@ -16,6 +16,7 @@ export const updateMeetupSchema = Joi.object<UpdateMeetupPayload>({
   description: Joi.string().allow(null),
   tags: Joi.array().items(Joi.string().required()).allow(null),
   timestamp: Joi.string().isoDate(),
+  participants: Joi.array().items(Joi.number().integer().positive()),
 });
 
 export const idSchema = Joi.object<SearchMeetupParams>({

@@ -5,5 +5,5 @@ CREATE TABLE meetups (
     tags TEXT[],
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     creator_id INTEGER REFERENCES users (id) NOT NULL,
-    participants INTEGER[] NOT NULL,
+    participants INTEGER[] NOT NULL
 );

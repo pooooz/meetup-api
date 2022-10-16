@@ -98,6 +98,17 @@ class Meetup {
       next(error);
     }
   }
+
+  async enroll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = await idSchema.validateAsync(req.params);
+      const userId = req.user?.id;
+      const updated = await db.one(meetupQueries.enroll, { id, userId });
+      res.status(200).json(updated);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const MeetupController = new Meetup();

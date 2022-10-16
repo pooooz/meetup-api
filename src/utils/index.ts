@@ -1,7 +1,7 @@
 import { CreateMeetupPayload, UpdateMeetupPayload } from '../shemes/meetup/interfaces';
 import { SearchMeetupPayload } from '../shemes/queries/interfaces';
 
-export const generateFormattedTags = (tags: Array<string>) => `'{${tags.map((tag) => `"${tag}"`).join(', ')}}'`;
+export const generateFormattedArray = (elements: Array<string | number>) => `'{${elements.map((element) => (typeof element === 'string' ? `"${element}"` : `${element}`)).join(', ')}}'`;
 
 export const generateInsertValues = (params: CreateMeetupPayload, userId: number) => ({
   ...{
@@ -27,8 +27,11 @@ export const generateUpdateQuery = (id: string, params: UpdateMeetupPayload) => 
     if (elem.value === null) {
       return `${elem.key} = ${elem.value}${idx !== definedParams.length - 1 ? ',' : ''}`;
     }
+    if (elem.key === 'participants') {
+      return `${elem.key} = ${generateFormattedArray([...new Set(elem?.value as Array<number>)] as Array<number>)}${idx !== definedParams.length - 1 ? ',' : ''}`;
+    }
     if (elem.key === 'tags') {
-      return `${elem.key} = ${generateFormattedTags(elem?.value as Array<string>)}${idx !== definedParams.length - 1 ? ',' : ''}`;
+      return `${elem.key} = ${generateFormattedArray(elem?.value as Array<string>)}${idx !== definedParams.length - 1 ? ',' : ''}`;
     }
     return `${elem.key} = '${elem.value}'${idx !== definedParams.length - 1 ? ',' : ''}`;
   }).join(' ');

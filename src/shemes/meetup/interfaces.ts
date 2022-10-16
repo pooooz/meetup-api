@@ -18,4 +18,6 @@ export interface MeetupInfo {
   creator_id: number;
 }
 
-export type UpdateMeetupPayload = Partial<CreateMeetupPayload>
+export interface UpdateMeetupPayload extends Partial<CreateMeetupPayload> {
+  participants?: Array<number>
+}
