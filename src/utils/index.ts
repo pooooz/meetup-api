@@ -3,12 +3,14 @@ import { SearchMeetupPayload } from '../shemes/queries/interfaces';
 
 export const generateFormattedTags = (tags: Array<string>) => `'{${tags.map((tag) => `"${tag}"`).join(', ')}}'`;
 
-export const generateInsertValues = (params: CreateMeetupPayload) => ({
+export const generateInsertValues = (params: CreateMeetupPayload, userId: number) => ({
   ...{
     name: null,
     description: null,
     tags: null,
     timestamp: null,
+    creator: userId,
+    participants: `{${userId}}`,
   },
   ...params,
 });

@@ -56,9 +56,9 @@ class Meetup {
     try {
       const validValues = await createMeetupSchema.validateAsync(req.body);
 
-      const insertValues = generateInsertValues(validValues);
+      const insertValues = generateInsertValues(validValues, req.user?.id as number);
 
-      const meetup = await db.one(meetupQueries.create, { ...insertValues, creator: req.user?.id });
+      const meetup = await db.one(meetupQueries.create, insertValues);
 
       res.status(201).json(meetup);
     } catch (error) {
