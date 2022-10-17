@@ -8,6 +8,6 @@ const DATABASE_PORT = process.env.POSTGRES_PORT;
 
 const pgp = pgPromise();
 
-const connectionString = `postgresql://${USER}:${PASSWORD}@localhost:${DATABASE_PORT}/${NAME}`;
+const connectionString = `postgresql://${USER}:${PASSWORD}@${process.env.NODE_ENV === 'production' ? 'postgres' : 'localhost'}:${DATABASE_PORT}/${NAME}`;
 
 export const db = pgp(connectionString);
