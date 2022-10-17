@@ -1,2 +1,2 @@
-INSERT INTO meetups (name, description, tags, timestamp)
-VALUES (${name}, ${description}, ${tags}, ${timestamp}) RETURNING *
+INSERT INTO meetups (name, description, tags, timestamp, creator_id, participants)
+VALUES (${name}, ${description}, ${tags}, ${timestamp}, ${creator}, ${participants}) RETURNING *

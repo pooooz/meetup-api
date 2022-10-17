@@ -2,13 +2,12 @@ import { NextFunction, Request, Response } from 'express';
 
 import { db } from '../../database';
 import { meetupQueries } from '../../database/sql';
-import { CreateMeetupPayload, UpdateMeetupPayload } from './interfaces';
+import { CreateMeetupPayload, UpdateMeetupPayload } from '../../shemes/meetup/interfaces';
 import {
   generateInsertValues, generateSearchQuery, generateUpdateQuery, generateElementsCountQuery,
 } from '../../utils';
-import {
-  createMeetupSchema, idSchema, updateMeetupSchema, queryObjectSchema,
-} from './schemes';
+import { createMeetupSchema, updateMeetupSchema, idSchema } from '../../shemes/meetup';
+import { queryObjectSchema } from '../../shemes/queries';
 
 class Meetup {
   async getAllMeetups(req: Request, res: Response, next: NextFunction) {
@@ -57,7 +56,7 @@ class Meetup {
     try {
       const validValues = await createMeetupSchema.validateAsync(req.body);
 
-      const insertValues = generateInsertValues(validValues);
+      const insertValues = generateInsertValues(validValues, req.user?.id as number);
 
       const meetup = await db.one(meetupQueries.create, insertValues);
 
@@ -85,11 +84,27 @@ class Meetup {
   ) {
     try {
       const validValues = await updateMeetupSchema.validateAsync(req.body);
+      if (Object.keys(validValues).length !== 0) {
+        const { id } = await idSchema.validateAsync(req.params);
+
+        const updatedMeetup = await db.one(generateUpdateQuery(id, validValues));
+
+        res.status(200).json(updatedMeetup);
+        return;
+      }
+
+      res.status(400).json({ type: 'error', message: 'The request must contain fields to update' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async enroll(req: Request, res: Response, next: NextFunction) {
+    try {
       const { id } = await idSchema.validateAsync(req.params);
-
-      const updatedMeetup = await db.one(generateUpdateQuery(id, validValues));
-
-      res.status(200).json(updatedMeetup);
+      const userId = req.user?.id;
+      const updated = await db.one(meetupQueries.enroll, { id, userId });
+      res.status(200).json(updated);
     } catch (error) {
       next(error);
     }

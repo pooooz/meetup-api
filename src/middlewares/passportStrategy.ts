@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { ACCESS_TOKEN_SECRET } from '../constants';
 import { db } from '../database';
 import { userQueries } from '../database/sql';
+import { UserInfo } from '../shemes/user/interfaces';
 
 const cookieExtractor = (req: Request) => {
   if (req.cookies) {
@@ -19,9 +20,10 @@ const options = {
 
 export const authStrategy = new JWTStrategy(options, async (jwtPayload, done) => {
   try {
-    const user = await db.oneOrNone(userQueries.getById, { id: jwtPayload.id });
+    const user = await db.oneOrNone<UserInfo>(userQueries.getById, { id: jwtPayload.id });
     if (user) {
-      return done(null, user);
+      const { id, name, email } = user;
+      return done(null, { id, name, email });
     }
     return done(null, false);
   } catch (error) {

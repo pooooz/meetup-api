@@ -23,6 +23,7 @@ export const meetupQueries = {
   getById: sql('meetup/selectById.sql'),
   deleteById: sql('meetup/deleteById.sql'),
   create: sql('meetup/create.sql'),
+  enroll: sql('meetup/enroll.sql'),
 };
 
 export const userQueries = {

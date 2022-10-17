@@ -1,7 +1,7 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    email TEXT UNIQUE,
+    email TEXT UNIQUE NOT NULL,
     name TEXT,
-    password TEXT,
+    password TEXT NOT NULL,
     refresh_token TEXT
 );

@@ -5,12 +5,14 @@ import { sign, verify } from 'jsonwebtoken';
 import { db } from '../../database';
 import { userQueries } from '../../database/sql';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../constants';
-import { createUserSchema, refreshTokenSchema } from './schemes';
+import { createUserSchema } from '../../shemes/user';
+import { refreshTokenSchema } from '../../shemes/tokens';
 import {
   ACCESS_TOKEN_LIFETIME,
   REFRESH_TOKEN_LIFETIME,
 } from './constants';
-import { CustomJWTPayload, UserSchema } from './interfaces';
+import { UserInfo } from '../../shemes/user/interfaces';
+import { convertLifetimeStringToMilliseconds } from '../../utils';
 
 class Auth {
   async signUp(req: Request, res: Response, next: NextFunction) {
@@ -18,7 +20,7 @@ class Auth {
       const { email, name, password } = await createUserSchema.validateAsync(req.body);
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const { id } = await db.one<UserSchema>(
+      const { id } = await db.one<UserInfo>(
         userQueries.create,
         { email, name, password: hashedPassword },
       );
@@ -64,7 +66,13 @@ class Auth {
 
       await db.any(userQueries.updateRefreshToken, { id, refreshToken });
 
-      res.status(200)
+      res
+        .cookie('accessToken', accessToken, {
+          maxAge: convertLifetimeStringToMilliseconds(ACCESS_TOKEN_LIFETIME),
+        })
+        .cookie('refreshToken', refreshToken, {
+          maxAge: convertLifetimeStringToMilliseconds(REFRESH_TOKEN_LIFETIME),
+        }).status(200)
         .json({
           accessToken, refreshToken, id, name, email,
         });
@@ -75,7 +83,7 @@ class Auth {
 
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const { refreshToken } = await refreshTokenSchema.validateAsync(req.body);
+      const { refreshToken } = await refreshTokenSchema.validateAsync(req.cookies);
 
       const dataObject:
         CustomJWTPayload | string = verify(
@@ -90,7 +98,11 @@ class Auth {
         { expiresIn: ACCESS_TOKEN_LIFETIME },
       );
 
-      res.status(200).send({ refreshToken, accessToken });
+      res.cookie('accessToken', accessToken, {
+        maxAge: convertLifetimeStringToMilliseconds(ACCESS_TOKEN_LIFETIME),
+      })
+        .status(200)
+        .send({ refreshToken, accessToken });
     } catch (error) {
       next(error);
     }
