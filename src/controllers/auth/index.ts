@@ -2,15 +2,16 @@ import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { sign, verify } from 'jsonwebtoken';
 
+import {
+  ACCESS_TOKEN_LIFETIME,
+  REFRESH_TOKEN_LIFETIME,
+} from './constants';
+
 import { db } from '../../database';
 import { userQueries } from '../../database/sql';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../constants';
 import { createUserSchema } from '../../shemes/user';
 import { refreshTokenSchema } from '../../shemes/tokens';
-import {
-  ACCESS_TOKEN_LIFETIME,
-  REFRESH_TOKEN_LIFETIME,
-} from './constants';
 import { UserInfo } from '../../shemes/user/interfaces';
 import { convertLifetimeStringToMilliseconds } from '../../utils';
 

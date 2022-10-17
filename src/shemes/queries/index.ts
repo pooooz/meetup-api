@@ -1,4 +1,5 @@
 import Joi from 'joi';
+
 import { SearchMeetupPayload } from './interfaces';
 
 const integerGreaterThanZero = /^[1-9]\d*$/;

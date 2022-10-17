@@ -4,9 +4,9 @@ import { db } from '../../database';
 import { meetupQueries } from '../../database/sql';
 import { CreateMeetupPayload, UpdateMeetupPayload } from '../../shemes/meetup/interfaces';
 import {
-  generateInsertValues, generateSearchQuery, generateUpdateQuery, generateElementsCountQuery,
+  generateElementsCountQuery, generateInsertValues, generateSearchQuery, generateUpdateQuery,
 } from '../../utils';
-import { createMeetupSchema, updateMeetupSchema, idSchema } from '../../shemes/meetup';
+import { createMeetupSchema, idSchema, updateMeetupSchema } from '../../shemes/meetup';
 import { queryObjectSchema } from '../../shemes/queries';
 
 class Meetup {
