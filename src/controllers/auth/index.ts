@@ -68,12 +68,13 @@ class Auth {
       await db.any(userQueries.updateRefreshToken, { id, refreshToken });
 
       res
+        .status(200)
         .cookie('accessToken', accessToken, {
           maxAge: convertLifetimeStringToMilliseconds(ACCESS_TOKEN_LIFETIME),
         })
         .cookie('refreshToken', refreshToken, {
           maxAge: convertLifetimeStringToMilliseconds(REFRESH_TOKEN_LIFETIME),
-        }).status(200)
+        })
         .json({
           accessToken, refreshToken, id, name, email,
         });
@@ -99,10 +100,11 @@ class Auth {
         { expiresIn: ACCESS_TOKEN_LIFETIME },
       );
 
-      res.cookie('accessToken', accessToken, {
-        maxAge: convertLifetimeStringToMilliseconds(ACCESS_TOKEN_LIFETIME),
-      })
+      res
         .status(200)
+        .cookie('accessToken', accessToken, {
+          maxAge: convertLifetimeStringToMilliseconds(ACCESS_TOKEN_LIFETIME),
+        })
         .send({ refreshToken, accessToken });
     } catch (error) {
       next(error);
