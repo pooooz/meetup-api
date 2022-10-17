@@ -1,13 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
+import pgPromise from 'pg-promise';
 
 import { db } from '../../database';
-import { meetupQueries } from '../../database/sql';
+import { meetupQueries, userQueries } from '../../database/sql';
 import { CreateMeetupPayload, UpdateMeetupPayload } from '../../shemes/meetup/interfaces';
 import {
   generateElementsCountQuery, generateInsertValues, generateSearchQuery, generateUpdateQuery,
 } from '../../utils';
 import { createMeetupSchema, idSchema, updateMeetupSchema } from '../../shemes/meetup';
 import { queryObjectSchema } from '../../shemes/queries';
+
+import QueryResultError = pgPromise.errors.QueryResultError;
 
 class Meetup {
   async getAllMeetups(req: Request, res: Response, next: NextFunction) {
@@ -87,9 +90,36 @@ class Meetup {
       if (Object.keys(validValues).length !== 0) {
         const { id } = await idSchema.validateAsync(req.params);
 
-        const updatedMeetup = await db.one(generateUpdateQuery(id, validValues));
+        if (validValues.participants?.length) {
+          try {
+            const promiseArray = validValues.participants.map(
+              (attemptId) => db.one(userQueries.getById, { id: attemptId }),
+            );
+
+            await Promise.all(promiseArray);
+          } catch (error) {
+            if (error instanceof QueryResultError) {
+              next({
+                ...(error as QueryResultError),
+                message: `There is no user with id equal to ${(error.query.match(/\d+/))}`,
+              });
+            }
+            return;
+          }
+        }
+
+        const updatedMeetup = await db.one(generateUpdateQuery(
+          id,
+          {
+            ...validValues,
+            participants: validValues.participants
+              ? [req.user?.id as number, ...validValues.participants]
+              : [req.user?.id as number],
+          },
+        ));
 
         res.status(200).json(updatedMeetup);
+
         return;
       }
 
