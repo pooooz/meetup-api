@@ -1,4 +1,5 @@
 import Joi from 'joi';
+
 import { RefreshTokenPayload } from './interfaces';
 
 export const refreshTokenSchema = Joi.object<RefreshTokenPayload>({

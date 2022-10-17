@@ -1,6 +1,7 @@
 import 'dotenv/config';
-import { QueryFile, IQueryFileOptions } from 'pg-promise';
-import * as path from 'path';
+import path from 'path';
+
+import { IQueryFileOptions, QueryFile } from 'pg-promise';
 
 function sql(file: string): QueryFile {
   const fullPath: string = path.join(__dirname, file);

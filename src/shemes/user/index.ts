@@ -1,4 +1,5 @@
 import Joi from 'joi';
+
 import { CreateUserPayload } from './interfaces';
 
 const usernamePattern = /^[A-Za-z]\w{2,29}$/;
