@@ -16,7 +16,7 @@ export const permissionCheck = (permission: 'creator') => async (req: Request, r
         if (meetup.creator_id === userInfo?.id) {
           next();
         } else {
-          res.status(403).json({ type: 'error', message: 'Permission denied' });
+          res.status(403).json({ message: 'Permission denied' });
         }
       } catch (error) {
         next(error);
@@ -24,7 +24,7 @@ export const permissionCheck = (permission: 'creator') => async (req: Request, r
       break;
     }
     default: {
-      res.status(403).json({ type: 'error', message: 'Permission denied' });
+      res.status(403).json({ message: 'Permission denied' });
     }
   }
 };

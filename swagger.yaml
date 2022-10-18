@@ -1,0 +1,498 @@
+openapi: 3.0.3
+info:
+  title: Meetup API
+  description: |-
+    Meetup API with basic functionality
+  contact:
+    email: antoivans@gmail.com
+  version: 1.0.0
+servers:
+  - url: http://localhost/
+tags:
+  - name: auth
+    description: Operations about user
+  - name: meetup
+    description: Operations about meetups
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: Register new user
+      description: Register new user
+      operationId: signUp
+      requestBody:
+        description: Create a new user in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserPayload'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        '400':
+          description: Bad request
+          content:
+            applixaxtion/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Internal server error
+  /auth/signIn:
+    post:
+      tags:
+        - auth
+      summary: Authenticate User
+      description: Authenticate User
+      operationId: signIn
+      requestBody:
+        description: Create a new user in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserPayload'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoWithTokens'
+        '400':
+          description: Bad request
+          content:
+            applixaxtion/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Internal server error
+  /auth/refresh:
+    post:
+      tags:
+        - auth
+      summary: Refresh access token
+      description: Refresh access token
+      operationId: refresh
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal server error
+      security:
+        - refreshToken: []
+  /meetup/:
+    get:
+      description: Get filtered meetups
+      summary: Get filetred meetups
+      tags:
+        - meetup
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: description
+          schema:
+            type: string
+        - in: query
+          name: tags
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: timestamp
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: to
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [id, name, timestamp]
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: page
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MeetupInfo'
+        '400':
+          description: Bad request
+          content:
+            applixaxtion/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal server error
+      security:
+        - accessToken: []
+    post:
+      description: Create new meetup
+      summary: Create new meetup
+      tags:
+        - meetup
+      requestBody:
+        description: Create meetup
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeetupPayload'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MeetupInfo'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal server error
+      security:
+        - accessToken: []
+  /meetup/{meetupId}:
+    parameters:
+      - in: path
+        name: meetupId
+        description: The meetup Id
+        required: true
+    get:
+      description: Get meetup by Id
+      summary: Get meetup by Id
+      tags:
+        - meetup
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeetupInfo'
+        '400':
+          description: Bad request
+          content:
+            applixaxtion/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal server error
+      security:
+        - accessToken: []
+    patch:
+      description: Update meetup info
+      summary: Update meetup info
+      tags:
+        - meetup
+      requestBody:
+        description: Update meetup info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeetupPayload'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeetupInfo'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal server error
+      security:
+        - accessToken: []
+    delete:
+      description: Delete meetup
+      summary: Delete meetup
+      tags:
+        - meetup
+      responses:
+        '200':
+          desription: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeetupInfo'
+        '400':
+          description: Bad request
+          content:
+            applixaxtion/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal server error
+      security:
+        - accessToken: []
+    put:
+      description: Sing up for a meetup
+      summary: Sign up for a meetup
+      tags:
+        - meetup
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeetupInfo'
+        '400':
+          description: Bad request
+          content:
+            applixaxtion/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal server error
+      security:
+        - accessToken: []
+components:
+  schemas:
+    CreateUserPayload:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+          example: example@example.com
+        name:
+          type: string
+          example: my name
+          pattern: '^[A-Za-z]\w{2,29}$'
+        password:
+          type: string
+          example: my_password_123
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: my name
+          pattern: '^[A-Za-z]\w{2,29}$'
+        email:
+          type: string
+          example: example@example.com
+    Tokens:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJtZUBnbWFpbC5
+        refreshToken:
+          type: string
+          example: jb20iLCJuYW1lIjoicG96IiwiaWF0IjoxNjY2MDg0NjYwLCJleH
+    UserInfoWithTokens:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJtZUBnbWFpbC5
+        refreshToken:
+          type: string
+          example: jb20iLCJuYW1lIjoicG96IiwiaWF0IjoxNjY2MDg0NjYwLCJleH
+        id:
+          type: integer
+          example: 10
+        name:
+          type: string
+          example: my name
+          pattern: '^[A-Za-z]\w{2,29}$'
+        email:
+          type: string
+          example: example@example.com
+    MeetupInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        name:
+          type: string
+          example: Simple meetup
+        description:
+          type: string
+          example: Basic description
+        tags:
+          type: array
+          items:
+            type: string
+          example: ['tag1', 'tag2']
+        timestamp:
+          type: string
+          format: date-time
+        participants:
+          type: array
+          items:
+            type: integer
+          example: [1, 113, 44]
+    MeetupPayload:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Simple meetup
+        description:
+          type: string
+          example: Basic description
+        tags:
+          type: array
+          items:
+            type: string
+          example: ['tag1', 'tag2']
+        timestamp:
+          type: string
+          format: date-time
+        participants:
+          type: array
+          items:
+            type: integer
+          example: [1, 113, 44]
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: '"id" with value "a" fails to match the non-negative integer pattern'
+        type:
+          type: string
+          example: any.required
+    UnauthorizedError:
+      type: object
+      properties:
+        name:
+          type: string
+          example: JsonWebTokenError
+        message:
+          type: string
+          example: invalid signature
+    ForbiddenError:
+      type: object
+      properties:
+        type:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Permission denied
+        detail:
+          type: string
+          example: Nod details
+  securitySchemes:
+    accessToken:
+      type: apiKey
+      in: cookie
+      name: accessToken
+    refreshToken:
+      type: apiKey
+      in: cookie
+      name: refreshToken

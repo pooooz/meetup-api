@@ -10,7 +10,7 @@ import {
 import { db } from '../../database';
 import { userQueries } from '../../database/sql';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../constants';
-import { createUserSchema } from '../../shemes/user';
+import { createUserSchema, loginUserSchema } from '../../shemes/user';
 import { refreshTokenSchema } from '../../shemes/tokens';
 import { UserInfo } from '../../shemes/user/interfaces';
 import { convertLifetimeStringToMilliseconds } from '../../utils';
@@ -36,18 +36,18 @@ class Auth {
 
   async signIn(req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, password } = await createUserSchema.validateAsync(req.body);
+      const { email, password } = await loginUserSchema.validateAsync(req.body);
 
       const user = await db.oneOrNone(userQueries.getByEmail, { email });
       if (!user) {
-        res.status(400).json({ message: 'Email or password is wrong' });
+        next({ status: 400, message: 'Email or password is wrong' });
         return;
       }
 
       const isMatches = await bcrypt.compare(password, user.password);
 
       if (!isMatches) {
-        res.status(400).json({ message: 'Email or password is wrong' });
+        next({ status: 400, message: 'Email or password is wrong' });
         return;
       }
 
